@@ -80,11 +80,17 @@
           "description": "Grafana instance URL",
           "order": 1
         },
+        "grafana-vscode.baseHref": {
+          "type": "string",
+          "default": "/",
+          "description": "Grafana instance base href",
+          "order": 2
+        },
         "grafana-vscode.service-account-token": {
           "type": "boolean",
           "default": true,
           "markdownDescription": "A service account token for your Grafana instance. Click the link below to add this to secure storage.\n\n[Set your token, securely](command:grafana-vscode.setPassword)",
-          "order": 2
+          "order": 3
         },
         "grafana-vscode.theme": {
           "type": "string",
@@ -106,7 +112,7 @@
           "type": "boolean",
           "default": true,
           "markdownDescription": "Enable basic telemetry. All data is anonymous and only used to help with feature prioritization/gloating/etc.",
-          "order": 3
+          "order": 4
         }
       }
     }

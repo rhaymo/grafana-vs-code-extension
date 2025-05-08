@@ -15,13 +15,27 @@ let server: Server;
 
 export const TOKEN_SECRET = "grafana-vscode.token";
 
+function normalizePath(input:string) {
+  /*let temp=input;
+  if (!temp.startsWith('/')) temp='/'+temp;
+  if (!temp.endsWith('/')) temp=temp+'/';
+*/
+
+  // Remove any number of "/" from start and end of string
+  let trimmedInput = input.replace(/^\/+|\/+$/g, '');
+
+  return `${trimmedInput}`;
+}
+
 export async function startServer(secrets: vscode.SecretStorage, extensionPath: string) {
   const settings = vscode.workspace.getConfiguration("grafana-vscode");
   const token = await secrets.get(TOKEN_SECRET);
-  let URL = String(settings.get("URL"));
+  let baseHref = normalizePath(String(settings.get("baseHref")));
+  let URL = String(settings.get("URL"));  
   if (URL.slice(-1) === "/") {
-    URL = URL.slice(0, -1);
-  }
+    //URL = URL.slice(0, -1);
+    URL = URL + baseHref
+  } else URL = URL + "/"+baseHref
 
   const corsOptions = {
     origin: `http://localhost:${port}`,
@@ -29,7 +43,6 @@ export async function startServer(secrets: vscode.SecretStorage, extensionPath: 
   };
 
   const app = express();
-  app.use(detectRequestSource);
   server = createServer(app);
 
   const proxy = createProxyServer({
@@ -91,7 +104,8 @@ export async function startServer(secrets: vscode.SecretStorage, extensionPath: 
           'User-Agent': util.getUserAgent(),
         },
       });
-      res.send(await response.text());
+      const textResponse = await response.text();
+      res.send(textResponse.replace(`<base href="/${baseHref}/" />`, '<base href="/" />'));
 
       if (!response.ok && response.status === 302) {
         sendErrorPage(res, msg + "<p>Authentication error</p>");
@@ -148,7 +162,6 @@ export async function startServer(secrets: vscode.SecretStorage, extensionPath: 
       }
 
       const resource = Resource.fromFile(filename).withSpec(req.body.dashboard);
-
       resource.write().then(() => {
         res.send({
           id: 1,
@@ -187,7 +200,7 @@ export async function startServer(secrets: vscode.SecretStorage, extensionPath: 
     "/avatar/*",
   ];
   for (const path of mustProxyGET) {
-    app.get(path, function (req: Request, res: Response) {
+    app.get(""+path, function (req: Request, res: Response) {
       proxy.web(req, res, {});
     });
   }
@@ -198,7 +211,7 @@ export async function startServer(secrets: vscode.SecretStorage, extensionPath: 
     "/api/datasources/uid/*",
   ];
   for (const path of mustProxyPOST) {
-    app.post(path, function (req: Request, res: Response) {
+    app.post(""+path, function (req: Request, res: Response) {
       proxy.web(req, res, {});
     });
   }
@@ -230,7 +243,7 @@ export async function startServer(secrets: vscode.SecretStorage, extensionPath: 
     /* eslint-enable @typescript-eslint/naming-convention */
   };
   for (const path in blockJSONget) {
-    app.get(path, function (req: Request, res: Response) {
+    app.get(""+path, function (req: Request, res: Response) {
       res.send(blockJSONget[path]);
     });
   }
@@ -243,7 +256,7 @@ export async function startServer(secrets: vscode.SecretStorage, extensionPath: 
     /* eslint-enable @typescript-eslint/naming-convention */
   };
   for (const path in blockJSONpost) {
-    app.post(path, function (req: Request, res: Response) {
+    app.post(""+path, function (req: Request, res: Response) {
       res.send(blockJSONpost[path]);
     });
   }
@@ -251,7 +264,7 @@ export async function startServer(secrets: vscode.SecretStorage, extensionPath: 
   server.listen(port, () => {
     //@ts-expect-error
     port = server?.address()?.port;
-    console.log("Server started");
+    console.log("Server started "+port);
   });
 }
 
