@@ -4,7 +4,7 @@
   "displayName": "Grafana",
   "description": "Grafana Editor",
   "icon": "public/grafana_icon.png",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -115,7 +115,45 @@
           "order": 4
         }
       }
-    }
+    },
+    "walkthroughs": [
+      {
+        "id": "intro",
+        "title": "Getting started with VS Code for Grafana",
+        "description": "Just a few more steps before some Grafana magic in your editor!",
+        "steps": [
+          {
+            "id": "grafana_url_setting",
+            "title": "Provide the URL of your Grafana instance",
+            "description": "This extension uses data held by your Grafana instance to enable local previews of dashboards. **This access is purely read-only**, nothing will ever be written to the istance.\nIf you are using a local Grafana instance, the default value is ``http://localhost:3000``.\n[Configure Grafana instance URL](command:grafana-vscode.setGrafanaURL)",
+            "media": {
+              "image": "media/grafana_logo.png",
+							"altText": "Grafana logo"
+            },
+            "completionEvents": ["onSettingChanged:grafana-vscode.URL"]
+          },
+          {
+            "id": "grafana_service_account_token_setting",
+            "title": "Provide a service account token used to authenticate to Grafana",
+            "description": "The steps required to create a service account and an associated token can be found in [Grafana's documentation](https://grafana.com/docs/grafana/latest/administration/service-accounts/#create-a-service-account-in-grafana).\n[Configure Grafana service account token](command:grafana-vscode.setPassword)",
+            "media": {
+              "image": "media/grafana_logo.png",
+							"altText": "Grafana logo"
+            },
+            "completionEvents": ["onSettingChanged:grafana-vscode.service-account-token"]
+          },
+          {
+            "id": "preview_dashboards",
+            "title": "Preview dashboards",
+            "description": "Dashboards can be previewed locally, by right-clicking on a file or by calling the \"Edit in Grafana\" command.",
+            "media": {
+              "image": "media/preview_commands.png",
+							"altText": "Preview commands"
+            }
+          }
+        ]
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",
@@ -152,13 +190,13 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.18.2",
+    "express": "^4.21.2",
     "http-proxy": "^1.18.1",
     "http-proxy-middleware": "^2.0.6",
     "open": "^8.4.2",
     "source-map-support": "^0.5.21",
     "transformer-proxy": "^0.3.5",
     "uuid": "^9.0.1",
-    "yaml": "^2.5.1"
+    "yaml": "^2.7.0"
   }
 }
